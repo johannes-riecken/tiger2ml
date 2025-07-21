@@ -14,18 +14,14 @@ let parse_file ppf inputfile =
   fprintf ppf "@[%a@]@." Pprintast.structure m
 
 let usage =
-  Printf.sprintf "Usage: %s <options> <file>\nOptions are:" (Filename.basename Sys.executable_name)
+  Printf.sprintf "Usage: %s <options> <file>\nOptions are:"
+    (Filename.basename Sys.executable_name)
 
 let main () =
-  try
-    Arg.parse [] (parse_file Format.err_formatter) usage
-  with
-    Error.Error (loc, err) ->
+  try Arg.parse [] (parse_file Format.err_formatter) usage with
+  | Error.Error (loc, err) ->
       eprintf "%aError: %a.@." Location.print loc Error.report err
-  | Parsing.Parse_error ->
-      eprintf "Parsing error.@."
-  | Failure e ->
-      eprintf "Internal error: %s@." e
+  | Parsing.Parse_error -> eprintf "Parsing error.@."
+  | Failure e -> eprintf "Internal error: %s@." e
 
-let _ =
-  main ()
+let _ = main ()

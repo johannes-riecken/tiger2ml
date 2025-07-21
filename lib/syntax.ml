@@ -3,17 +3,15 @@
    Distributed under the Q Public License, version 1.0. *)
 
 type loc = Location.t
-
-type id =
-  loc * string
+type id = loc * string
 
 type var =
-    PNameVar of loc * id
+  | PNameVar of loc * id
   | PFieldVar of loc * var * id
   | PIndexVar of loc * var * exp
 
 and exp =
-    PBinExp of loc * exp * string * exp
+  | PBinExp of loc * exp * string * exp
   | PUnaryExp of loc * string * exp
   | PIntExp of loc * int
   | PStringExp of loc * string
@@ -32,24 +30,20 @@ and exp =
   | PRecordExp of loc * id * (id * exp) list
 
 and dec =
-    PVarDec of loc * (id * id option * exp)
+  | PVarDec of loc * (id * id option * exp)
   | PTypeDec of loc * typ list
   | PFunctionDec of loc * (id * (id * id) list * id option * exp) list
 
 and typ =
-    PRecordTyp of loc * id * (id * id) list
+  | PRecordTyp of loc * id * (id * id) list
   | PArrayTyp of loc * id * id
   | PNameTyp of loc * id * id
 
-let typ_name =
-  function
-    PRecordTyp (_, id, _)
-  | PArrayTyp (_, id, _)
-  | PNameTyp (_, id, _) -> id
+let typ_name = function
+  | PRecordTyp (_, id, _) | PArrayTyp (_, id, _) | PNameTyp (_, id, _) -> id
 
-let loc_exp =
-  function
-    PBinExp (loc, _, _, _)
+let loc_exp = function
+  | PBinExp (loc, _, _, _)
   | PUnaryExp (loc, _, _)
   | PIntExp (loc, _)
   | PStringExp (loc, _)
@@ -65,16 +59,11 @@ let loc_exp =
   | PWhileExp (loc, _, _)
   | PForExp (loc, _, _, _, _)
   | PArrayExp (loc, _, _, _)
-  | PRecordExp (loc, _, _) -> loc
+  | PRecordExp (loc, _, _) ->
+      loc
 
-let loc_var =
-  function
-    PNameVar (loc, _)
-  | PFieldVar (loc, _, _)
-  | PIndexVar (loc, _, _) -> loc
+let loc_var = function
+  | PNameVar (loc, _) | PFieldVar (loc, _, _) | PIndexVar (loc, _, _) -> loc
 
-let loc_dec =
-  function
-    PVarDec (loc, _)
-  | PTypeDec (loc, _)
-  | PFunctionDec (loc, _) -> loc
+let loc_dec = function
+  | PVarDec (loc, _) | PTypeDec (loc, _) | PFunctionDec (loc, _) -> loc

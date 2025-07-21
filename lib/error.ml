@@ -5,7 +5,7 @@
 open Format
 
 type error =
-    TypeMismatch
+  | TypeMismatch
   | ImmutableAssignment of string
   | BadArgumentCount
   | BadFieldName
@@ -26,44 +26,26 @@ type error =
 
 exception Error of Location.t * error
 
-let error loc err =
-  raise (Error (loc, err))
+let error loc err = raise (Error (loc, err))
 
-let report ppf =
-  function
-    TypeMismatch ->
-      fprintf ppf "Type mismatch"
+let report ppf = function
+  | TypeMismatch -> fprintf ppf "Type mismatch"
   | ImmutableAssignment name ->
       fprintf ppf "Variable %s cannot be assigned to" name
-  | BadArgumentCount ->
-      fprintf ppf "Wrong number of arguments"
-  | BadFieldName ->
-      fprintf ppf "Wrong field name"
-  | TypeNotFound name ->
-      fprintf ppf "Type %s not found" name
-  | VariableNotFound name ->
-      fprintf ppf "Variable %s not found" name
-  | ArrayTypeExpected ->
-      fprintf ppf "Array type name expected"
-  | RecordTypeExpected ->
-      fprintf ppf "Record type name expected"
-  | FunctionNotFound name ->
-      fprintf ppf "Function %s not found" name
-  | ArrayExpected ->
-      fprintf ppf "Array expression expected"
-  | FieldNotFound name ->
-      fprintf ppf "Field %s not found" name
-  | RecordExpected ->
-      fprintf ppf "Record expression expected"
-  | IntExpected ->
-      fprintf ppf "Integer expression expected"
-  | UnitExpected ->
-      fprintf ppf "Unit expression expected"
+  | BadArgumentCount -> fprintf ppf "Wrong number of arguments"
+  | BadFieldName -> fprintf ppf "Wrong field name"
+  | TypeNotFound name -> fprintf ppf "Type %s not found" name
+  | VariableNotFound name -> fprintf ppf "Variable %s not found" name
+  | ArrayTypeExpected -> fprintf ppf "Array type name expected"
+  | RecordTypeExpected -> fprintf ppf "Record type name expected"
+  | FunctionNotFound name -> fprintf ppf "Function %s not found" name
+  | ArrayExpected -> fprintf ppf "Array expression expected"
+  | FieldNotFound name -> fprintf ppf "Field %s not found" name
+  | RecordExpected -> fprintf ppf "Record expression expected"
+  | IntExpected -> fprintf ppf "Integer expression expected"
+  | UnitExpected -> fprintf ppf "Unit expression expected"
   | BadBreak ->
       fprintf ppf "Illegal use of `break'; can only appear inside a loop"
-  | BadParse ->
-      fprintf ppf "Parsing error"
-  | IntOrStringExpected ->
-      fprintf ppf "Int or String expected"
-  | BadTypeCycle ->
-      fprintf ppf "Bad type cycle"
+  | BadParse -> fprintf ppf "Parsing error"
+  | IntOrStringExpected -> fprintf ppf "Int or String expected"
+  | BadTypeCycle -> fprintf ppf "Bad type cycle"
