@@ -1,0 +1,10 @@
+(library
+ (name tiger)
+ (public_name tiger2ml.tiger)
+ (modules emit error lexer parser syntax typing)
+ (libraries compiler-libs.common)
+ ; optional, enables better error messages
+ )(menhir
+ (modules parser)
+ )
+(ocamllex lexer)

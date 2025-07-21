@@ -23,16 +23,16 @@ let main = function
                 if
                   (TigerLib.get row_1 r_10 0 = 0
                   && TigerLib.get diag1_3 (r_10 + c_9) 0 = 0)
-                  && TigerLib.get diag2_4 (r_10 + (N_0 - 1) - c_9) 0 = 0
+                  && TigerLib.get diag2_4 (r_10 + 7 - c_9) 0 = 0
                 then (
                   TigerLib.set row_1 r_10 1 0;
                   TigerLib.set diag1_3 (r_10 + c_9) 1 0;
-                  TigerLib.set diag2_4 (r_10 + (N_0 - 1) - c_9) 1 0;
+                  TigerLib.set diag2_4 (r_10 + 7 - c_9) 1 0;
                   TigerLib.set col_2 c_9 r_10 0;
                   try_6 (c_9 + 1);
                   TigerLib.set row_1 r_10 0 0;
                   TigerLib.set diag1_3 (r_10 + c_9) 0 0;
-                  TigerLib.set diag2_4 (r_10 + (N_0 - 1) - c_9) 0 0)
+                  TigerLib.set diag2_4 (r_10 + 7 - c_9) 0 0)
               done
       in
       try_6 0

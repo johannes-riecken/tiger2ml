@@ -1,0 +1,4 @@
+(executable
+  (name main)
+  (libraries tiger2ml.tiger)
+(flags (:standard -w "-70")))

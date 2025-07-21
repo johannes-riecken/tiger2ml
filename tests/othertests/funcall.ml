@@ -1,17 +1,20 @@
-open Stdlib
+let main = function
+  | () ->
+      let rec fa_0 = function
+        | a_2 -> (
+            function
+            | b_3 ->
+                let rec a_a_4 = function
+                  | c_5 -> (
+                      function
+                      | d_6 ->
+                          TigerLib.print d_6;
+                          fb_1 c_5)
+                in
+                if a_2 < 5 then a_a_4 (a_2 + 1) b_3)
+      and fb_1 = function d_7 -> fa_0 d_7 " str2 " in
+      fa_0 4 " str1 ";
+      fb_1 1;
+      TigerLib.print "\n"
 
-exception Break
-
-let main () =
-  let rec _fa _a _b =
-    let rec _a_a _c _d =
-      _print _d;
-      _fb _c
-    in
-    if _a < 5 then _a_a (_a + 1) _b
-  and _fb _d = _fa _d " str2 " in
-  _fa 4 " str1 ";
-  _fb 1;
-  _print "\n"
-
-let _ = main ()
+let _ = TigerLib.run main

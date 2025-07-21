@@ -1,6 +1,9 @@
 (* Copyright 2014 Nicolas Ojeda Bar <n.oje.bar@gmail.com>.
    All rights reserved.
    Distributed under the Q Public License, version 1.0. *)
+(* Copyright 2014 Nicolas Ojeda Bar <n.oje.bar@gmail.com>.
+   All rights reserved.
+   Distributed under the Q Public License, version 1.0. *)
 
 open Typing
 open Parsetree
@@ -48,16 +51,16 @@ let emit_top_types typs =
     }
   in
   let typs = List.map mkrecord typs in
-  Str.type_ Recursive typs
+  Str.type_ typs ~loc:Location.none
 
 let rec expr = function
   | TBreakExp ->
       Exp.apply
         (Exp.ident (mkident "raise"))
-        [ (Nolabel, Exp.construct (mkident "TigerLib.Break") None) ]
+        [ ("", Exp.construct (mkident "TigerLib.Break") None) ]
   | TNilExp -> Exp.construct (mkident "None") None
-  | TIntExp n -> Exp.constant (Pconst_integer (string_of_int n, None))
-  | TStringExp s -> Exp.constant (Pconst_string (s, None))
+  | TIntExp n -> Exp.constant (Const_int n)
+  | TStringExp s -> Exp.constant (Const_string (s, None))
   | TUnitExp -> Exp.construct (mkident "()") None
   | TSeqExp (e1, e2) -> Exp.sequence (expr e1) (expr e2)
   | TLetExp (id, init, mf, e) ->
@@ -67,7 +70,7 @@ let rec expr = function
             {
               pvb_pat = Pat.var (Location.mknoloc id);
               pvb_expr =
-                Exp.apply (Exp.ident (mkident "ref")) [ (Nolabel, expr init) ];
+                Exp.apply (Exp.ident (mkident "ref")) [ ("", expr init) ];
               pvb_attributes = [];
               pvb_loc = Location.none;
             }
@@ -120,7 +123,7 @@ let rec expr = function
                             pvb_expr =
                               Exp.apply
                                 (Exp.ident (mkident "ref"))
-                                [ (Nolabel, Exp.ident (mkident a)) ];
+                                [ ("", Exp.ident (mkident a)) ];
                             pvb_attributes = [];
                             pvb_loc = Location.none;
                           };
@@ -141,7 +144,7 @@ let rec expr = function
   | TAssignExp (TNameVar (name, _), e) ->
       Exp.apply
         (Exp.ident (mkident ":="))
-        [ (Nolabel, Exp.ident (mkident name)); (Nolabel, expr e) ]
+        [ ("", Exp.ident (mkident name)); ("", expr e) ]
   | TAssignExp (TFieldVar (v, name, line), e) ->
       Exp.match_ (var v)
         [
@@ -152,11 +155,9 @@ let rec expr = function
               Exp.apply
                 (Exp.ident (mkident "raise"))
                 [
-                  ( Nolabel,
+                  ( "",
                     Exp.construct (mkident "TigerLib.Nil")
-                      (Some
-                         (Exp.constant
-                            (Pconst_integer (string_of_int line, None)))) );
+                      (Some (Exp.constant (Const_int line))) );
                 ];
           };
           {
@@ -172,10 +173,10 @@ let rec expr = function
       Exp.apply
         (Exp.ident (mkident "TigerLib.set"))
         [
-          (Nolabel, var v);
-          (Nolabel, expr e');
-          (Nolabel, expr e);
-          (Nolabel, Exp.constant (Pconst_integer (string_of_int line, None)));
+          ("", var v);
+          ("", expr e');
+          ("", expr e);
+          ("", Exp.constant (Const_int line));
         ]
   | TForExp (index, start, finish, body, false) ->
       Exp.for_
@@ -196,15 +197,15 @@ let rec expr = function
   | TCallExp (name, []) ->
       Exp.apply
         (Exp.ident (mkident name))
-        [ (Nolabel, Exp.construct (mkident "()") None) ]
+        [ ("", Exp.construct (mkident "()") None) ]
   | TCallExp (name, args) ->
       Exp.apply
         (Exp.ident (mkident name))
-        (List.map (fun e -> (Nolabel, expr e)) args)
+        (List.map (fun e -> ("", expr e)) args)
   | TArrayExp (size, init) ->
       Exp.apply
         (Exp.ident (mkident "Array.make"))
-        [ (Nolabel, expr size); (Nolabel, expr init) ]
+        [ ("", expr size); ("", expr init) ]
   | TRecordExp fields ->
       let mkfield (id, e) = (mkident id, expr e) in
       Exp.construct (mkident "Some")
@@ -224,7 +225,7 @@ let rec expr = function
 
 and var = function
   | TNameVar (s, Mutable m) when !m ->
-      Exp.apply (Exp.ident (mkident "!")) [ (Nolabel, Exp.ident (mkident s)) ]
+      Exp.apply (Exp.ident (mkident "!")) [ ("", Exp.ident (mkident s)) ]
   | TNameVar (s, _) -> Exp.ident (mkident s)
   | TFieldVar (v, name, line) ->
       Exp.match_ (var v)
@@ -236,11 +237,9 @@ and var = function
               Exp.apply
                 (Exp.ident (mkident "raise"))
                 [
-                  ( Nolabel,
+                  ( "",
                     Exp.construct (mkident "TigerLib.Nil")
-                      (Some
-                         (Exp.constant
-                            (Pconst_integer (string_of_int line, None)))) );
+                      (Some (Exp.constant (Const_int line))) );
                 ];
           };
           {
@@ -254,11 +253,7 @@ and var = function
   | TIndexVar (v, e, line) ->
       Exp.apply
         (Exp.ident (mkident "TigerLib.get"))
-        [
-          (Nolabel, var v);
-          (Nolabel, expr e);
-          (Nolabel, Exp.constant (Pconst_integer (string_of_int line, None)));
-        ]
+        [ ("", var v); ("", expr e); ("", Exp.constant (Const_int line)) ]
 
 let emit_ocaml typs e =
   let typs = List.map emit_top_types typs in
@@ -286,7 +281,7 @@ let emit_ocaml typs e =
     Str.eval
       (Exp.apply
          (Exp.ident (mkident "TigerLib.run"))
-         [ (Nolabel, Exp.ident (mkident "main")) ])
+         [ ("", Exp.ident (mkident "main")) ])
   in
   let m = typs @ [ e1; e2 ] in
   m

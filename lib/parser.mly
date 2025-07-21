@@ -4,6 +4,7 @@
 
 %{
 open Syntax
+open Parsing
 
 let loc_nth i =
   { Location.loc_start = Parsing.rhs_start_pos i;
